@@ -1,0 +1,28 @@
+channels:
+  console:
+    config: {}
+    enabled: true
+gateway:
+  auth_token: null
+  heartbeat_interval: 30
+  host: 127.0.0.1
+  max_connections: 100
+  port: 18789
+llms:
+  default:
+    provider: "openai"  # 阿里云兼容OpenAI API格式
+    api_key: "sk-your-dashscope-api-key"  # 替换为你的阿里云API密钥
+    model: "qwen-turbo"  # 或 qwen-plus, qwen-max
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    temperature: 0.7
+    max_tokens: 2000
+plugins: {}
+sandbox:
+  allowed_commands: []
+  enabled: true
+  timeout: 30
+  working_directory: null
+session:
+  max_history: 50
+  storage_path: null
+  timeout: 3600

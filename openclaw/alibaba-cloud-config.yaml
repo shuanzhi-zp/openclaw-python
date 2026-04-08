@@ -1,0 +1,40 @@
+# 阿里云通义千问(Qwen)配置示例
+# 
+# 使用方法:
+# 1. 复制此文件为 openclaw-config.yaml
+# 2. 替换 api_key 为你的阿里云API密钥
+# 3. 运行: openclaw start
+
+gateway:
+  host: "127.0.0.1"
+  port: 18789
+  auth_token: null
+  max_connections: 100
+  heartbeat_interval: 30
+
+channels:
+  console:
+    enabled: true
+    config: {}
+
+llms:
+  default:
+    provider: "alibaba"  # 或 "dashscope", "qwen"
+    api_key: "sk-your-dashscope-api-key"  # 替换为你的API密钥
+    model: "qwen-turbo"  # 可选模型: qwen-turbo, qwen-plus, qwen-max
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    temperature: 0.7
+    max_tokens: 2000
+
+plugins: {}
+
+session:
+  max_history: 50
+  timeout: 3600
+  storage_path: null
+
+sandbox:
+  enabled: true
+  allowed_commands: []
+  timeout: 30
+  working_directory: null

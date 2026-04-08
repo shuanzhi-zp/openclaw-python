@@ -1,0 +1,254 @@
+Metadata-Version: 2.4
+Name: openclaw
+Version: 2026.4.1
+Summary: OpenClaw - Your own personal AI assistant. Any OS. Any Platform.
+Author: OpenClaw Team
+License: MIT
+Keywords: ai,agent,assistant,llm,websocket,automation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: websockets>=12.0
+Requires-Dist: aiohttp>=3.9.0
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: rich>=13.7.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: httpx>=0.26.0
+Requires-Dist: asyncio-mqtt>=0.16.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: black>=23.12.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+
+# OpenClaw (Python Version)
+
+Your own personal AI assistant. Any OS. Any Platform.
+
+OpenClaw is an open-source AI agent framework that connects multiple messaging channels to various LLM providers with a plugin architecture and sandboxed tool execution.
+
+## Features
+
+- **Multi-Channel Support**: Connect via Console, Telegram, Discord, and more
+- **Multiple LLM Providers**: OpenAI, Anthropic Claude, Ollama, and custom providers
+- **Plugin System**: Extend functionality with custom plugins
+- **Sandboxed Execution**: Safe tool execution with configurable restrictions
+- **Session Management**: Persistent conversation history
+- **WebSocket Gateway**: Real-time bidirectional communication
+- **Self-Hosted**: Complete control over your data and API keys
+
+## Architecture
+
+```
+openclaw/
+├── src/openclaw/
+│   ├── gateway/          # WebSocket server & RPC handler
+│   ├── channels/         # Messaging channel adapters
+│   ├── plugins/          # Plugin system
+│   ├── sessions/         # Session management
+│   ├── llm/              # LLM provider integration
+│   ├── tools/            # Tool execution & sandboxing
+│   ├── config/           # Configuration management
+│   └── cli.py            # Command-line interface
+├── examples/             # Example code
+├── tests/                # Test suite
+└── docs/                 # Documentation
+```
+
+## Installation
+
+### Prerequisites
+
+- Python 3.10 or higher
+- pip (Python package manager)
+
+### Install from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/openclaw.git
+cd openclaw
+
+# Install in development mode
+pip install -e .
+
+# Or install with development dependencies
+pip install -e ".[dev]"
+```
+
+## Quick Start
+
+### 1. Initialize Configuration
+
+```bash
+openclaw init
+```
+
+This creates a sample `openclaw-config.yaml` file.
+
+### 2. Configure LLM Provider
+
+Edit the configuration file and add your API key:
+
+```yaml
+llms:
+  default:
+    provider: "openai"
+    api_key: "sk-your-api-key"
+    model: "gpt-4"
+```
+
+Or use environment variables:
+
+```bash
+export OPENCLAW_LLM_API_KEY=sk-your-api-key
+```
+
+### 3. Start the Gateway
+
+```bash
+openclaw start
+```
+
+The gateway will start on `ws://127.0.0.1:18789` by default.
+
+### 4. Connect and Chat
+
+Use the console channel to chat directly, or connect via WebSocket:
+
+```python
+import asyncio
+import websockets
+import json
+
+async def chat():
+    async with websockets.connect("ws://localhost:18789") as ws:
+        # Authenticate
+        await ws.send(json.dumps({"type": "auth", "token": "your-token"}))
+
+        # Send message
+        await ws.send(json.dumps({
+            "type": "channel_message",
+            "channel": "console",
+            "chat_id": "user1",
+            "sender": "user",
+            "content": "Hello, OpenClaw!"
+        }))
+
+asyncio.run(chat())
+```
+
+## Configuration
+
+See `openclaw-config.yaml` for all available options:
+
+- **Gateway**: Host, port, authentication, connection limits
+- **Channels**: Enable/configure messaging platforms
+- **LLMs**: Configure AI providers and models
+- **Plugins**: Enable/disable plugins
+- **Sessions**: Message history and persistence
+- **Sandbox**: Tool execution security settings
+
+## Creating Plugins
+
+Create a custom plugin by extending `BasePlugin`:
+
+```python
+from openclaw.plugins import BasePlugin
+
+class MyPlugin(BasePlugin):
+    async def initialize(self) -> bool:
+        # Initialize your plugin
+        return True
+
+    async def shutdown(self) -> None:
+        # Cleanup resources
+        pass
+
+    def get_rpc_methods(self):
+        return {
+            "my_method": self.my_handler,
+        }
+
+    async def my_method(self, **kwargs):
+        return {"result": "success"}
+```
+
+## Available Commands
+
+```bash
+# Show help
+openclaw --help
+
+# Start gateway
+openclaw start
+
+# Show status
+openclaw status
+
+# List plugins
+openclaw plugins
+
+# List channels
+openclaw channels
+
+# List LLM providers
+openclaw llms
+
+# Generate config
+openclaw init
+```
+
+## Development
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Code Formatting
+
+```bash
+black src/
+ruff check src/
+```
+
+### Type Checking
+
+```bash
+mypy src/
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OPENCLAW_HOST` | Gateway host | `127.0.0.1` |
+| `OPENCLAW_PORT` | Gateway port | `18789` |
+| `OPENCLAW_AUTH_TOKEN` | Authentication token | `null` |
+| `OPENCLAW_LLM_PROVIDER` | Default LLM provider | - |
+| `OPENCLAW_LLM_API_KEY` | LLM API key | - |
+| `OPENCLAW_LLM_MODEL` | Default model | `gpt-4` |
+
+## License
+
+MIT License
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+This is a Python implementation inspired by the original OpenClaw project.
